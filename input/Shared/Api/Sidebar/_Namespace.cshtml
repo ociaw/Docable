@@ -1,20 +1,33 @@
+@{
+	String revision = Document.GetString(VcsKeys.RevisionName);
+	IDocument containingRevision = Outputs.FromPipeline(nameof(Statiq.Docs.Pipelines.Api))
+		.FirstOrDefault(x => x.GetString(CodeAnalysisKeys.Kind) == "Revision" && x.GetString(VcsKeys.RevisionName) == revision);
+	if (containingRevision != null)
+	{
+		<div class="sidebar-root bg-white mb-3 page-box font-size-sm">
+			@if (containingRevision is object)
+			{
+				<div class="sidebar-nav-item sidebar-header mb-0 pb-0">Version</div>
+				<div class="sidebar-nav-item font-weight-normal mt-0 pt-0">@Context.GetTypeLink(containingRevision, false)</div>
+			}
+		</div>
+	}
+}
+
 <div class="sidebar-nav-item sidebar-header">Namespaces</div>
 <div class="sidebar-nav-children">
-	@{
-		String revision = Document.GetString(VcsKeys.RevisionName);
-		IList<Tuple<string, IDocument>> namespaces
-			= Outputs.FromPipeline(nameof(Statiq.Docs.Pipelines.Api))
-				.Where(x => x.GetString(CodeAnalysisKeys.Kind) == "Namespace" && x.GetString(VcsKeys.RevisionName) == revision)
-				.Select(x => Tuple.Create(x.GetString(CodeAnalysisKeys.DisplayName), x))
-				.OrderBy(x => x.Item1)
-				.ToList();
-		foreach(Tuple<string, IDocument> ns in namespaces)
-		{
-			string activeClass = Document.GetString(CodeAnalysisKeys.Kind) == "Namespace"
-				&& Document.GetString(CodeAnalysisKeys.DisplayName) == ns.Item1
-				? "active"
-				: null;
-			<div class="sidebar-nav-item @activeClass">@Context.GetTypeLink(ns.Item2, false)</div>
-		}
+@{
+	IList<(string name, IDocument doc)> namespaces = Outputs.FromPipeline(nameof(Statiq.Docs.Pipelines.Api))
+		.Where(x => x.GetString(CodeAnalysisKeys.Kind) == "Namespace" && x.GetString(VcsKeys.RevisionName) == revision)
+		.Select(x => (name: x.GetString(CodeAnalysisKeys.DisplayName), doc: x))
+		.OrderBy(x => x.name)
+		.ToList();
+	foreach((string name, IDocument doc) ns in namespaces)
+	{
+		string activeClass = Document.GetString(CodeAnalysisKeys.DisplayName) == ns.name
+			? "active"
+			: null;
+		<div class="sidebar-nav-item @activeClass">@Context.GetTypeLink(ns.doc, false)</div>
 	}
+}
 </div>

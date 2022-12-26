@@ -1,10 +1,18 @@
 @{
+	String revision = Document.GetString(VcsKeys.RevisionName);
+	IDocument containingRevision = Outputs.FromPipeline(nameof(Statiq.Docs.Pipelines.Api))
+		.FirstOrDefault(x => x.GetString(CodeAnalysisKeys.Kind) == "Revision" && x.GetString(VcsKeys.RevisionName) == revision);
     IDocument containingAssembly = Document.GetDocument(CodeAnalysisKeys.ContainingAssembly);
     IDocument containingNamespace = Document.GetDocument(CodeAnalysisKeys.ContainingNamespace);
     IDocument containingType = Document.GetDocument(CodeAnalysisKeys.ContainingType);
-    if (containingAssembly is object || containingNamespace is object || containingType is object)
+    if (containingRevision is object || containingAssembly is object || containingNamespace is object || containingType is object)
     {
         <div class="sidebar-root bg-white mb-3 page-box font-size-sm">
+			@if (containingRevision is object)
+			{
+				<div class="sidebar-nav-item sidebar-header mb-0 pb-0">Version</div>
+				<div class="sidebar-nav-item font-weight-normal mt-0 pt-0">@Context.GetTypeLink(containingRevision, false)</div>
+			}
             @if (containingAssembly is object)
             {
                 <div class="sidebar-nav-item sidebar-header mb-0 pb-0">Assembly</div>
