@@ -1,8 +1,9 @@
 <div class="sidebar-nav-item sidebar-header">Assemblies</div>
 @{
+	String revision = Document.GetString(VcsKeys.RevisionName);
     IReadOnlyList<IDocument> assemblies =
         Outputs.FromPipeline(nameof(Statiq.Docs.Pipelines.Api))
-            .Where(x => x.GetString(CodeAnalysisKeys.Kind) == "Assembly")
+            .Where(x => x.GetString(CodeAnalysisKeys.Kind) == "Assembly" && x.GetString(VcsKeys.RevisionName) == revision)
             .OrderBy(x => x.GetString(CodeAnalysisKeys.DisplayName))
             .ToList();
     foreach(IDocument assembly in assemblies)
