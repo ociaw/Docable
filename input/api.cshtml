@@ -1,5 +1,5 @@
 ArchivePipelines: Api
-ArchiveFilter: => GetString("Kind") == "Namespace"
+ArchiveFilter: => GetString("Kind") == "Revision"
 ArchiveOrderKey: DisplayName
 DestinationPath: => GetPath("ApiPath").Combine("index.html")
 NoSidebar: true
@@ -7,7 +7,7 @@ Title: API
 Order: 100
 Xref: api
 ---
-<h1>Namespaces</h1>
+<h1>Versions</h1>
 @foreach (IDocument document in Model.GetChildren())
 {
     <h3>@Context.GetTypeLink(document)</h3>
